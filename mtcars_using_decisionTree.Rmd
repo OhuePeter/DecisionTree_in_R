@@ -1,0 +1,40 @@
+---
+title: "mtcars_Decision_Tree"
+output: html_document
+---
+
+```# Example: mtcars
+data(mtcars)
+str(mtcars)
+mtcars$vs <- as.factor(mtcars$vs)
+mtcars$am <- as.factor(mtcars$am)
+# install.packages("rpart")
+library(rpart)  # recurssive partitioning
+library(caTools)
+
+## SPLIT DATA
+split2 <- sample.split(mtcars, SplitRatio = 0.8)
+split2
+
+train2 <- subset(mtcars, split=="TRUE")
+test2 <- subset(mtcars, split=="FALSE")
+str(train2)
+str(test2)
+
+## TRAIN MODEL
+DecTreeModel <- rpart(am~., data = train2, method = "class")
+
+# To see Decision tree, install rpart.plot
+install.packages("rpart.plot")
+library(rpart.plot)
+rpart.plot(DecTreeModel)
+
+## PREDICT ON TEST DATA
+fitted_value <- predict(DecTreeModel, newdata = test2, type = "class")
+fitted_value
+
+## EVALUATE THE MODEL
+table(test2$am, fitted_value)
+miss_class_error <- mean(fitted_value !=test2$am)
+miss_class_error
+print(paste("Accuracy=", 1- miss_class_error))
